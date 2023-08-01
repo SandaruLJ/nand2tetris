@@ -14,13 +14,13 @@ CHIP Or8Way {
 
     PARTS:
     // first layer of 4 OR gates
-    Or(a=in[0], b=in[1], out=orfirstquarter);
-    Or(a=in[2], b=in[3], out=orsecondquarter);
-    Or(a=in[4], b=in[5], out=orthirdquarter);
-    Or(a=in[6], b=in[7], out=orfourthquarter);
+    Or(a=in[0], b=in[1], out=orfirst2);
+    Or(a=in[2], b=in[3], out=orsecond2);
+    Or(a=in[4], b=in[5], out=orthird2);
+    Or(a=in[6], b=in[7], out=orfourth2);
     // second layer of 2 OR gates
-    Or(a=orfirstquarter, b=orsecondquarter, out=orfirsthalf);
-    Or(a=orthirdquarter, b=orfourthquarter, out=orsecondhalf);
+    Or(a=orfirst2, b=orsecond2, out=orfirsthalf);
+    Or(a=orthird2, b=orfourth2, out=orsecondhalf);
     // last layer of the final OR gate
     Or(a=orfirsthalf, b=orsecondhalf, out=out);
 }
