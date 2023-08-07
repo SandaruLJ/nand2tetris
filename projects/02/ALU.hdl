@@ -61,7 +61,14 @@ CHIP ALU {
 
     /* negate out */
     Not16(in=fout, out=notout);
-    Mux16(a=fout, b=notout, sel=no, out=out);
+    Mux16(a=fout, b=notout, sel=no, out=out,  // out
+          out[0..7]=zrin1, out[8..15]=zrin2, out[15]=ngin);
 
-    /* TODO: Set flags (status outputs) */
+    /* set flags (status outputs) */
+    And(a=true, b=ngin, out=ng);  // ng flag
+    // zr flag
+    Or8Way(in=zrin1, out=zrorhalf1);
+    Or8Way(in=zrin2, out=zrorhalf2);
+    Or(a=zrorhalf1, b=zrorhalf2, out=zror);
+    Not(in=zror, out=zr);
 }
