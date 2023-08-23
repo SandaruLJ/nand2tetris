@@ -9,33 +9,43 @@
 // This program only needs to handle arguments that satisfy
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
-    // initialize variables
-    @sum
+    // initialize values
+    @R2
     M=0
+    @cmp  // Bitwise AND this with multiplier bits
+    M=1   // starts with 1 and shifts left with each iteration
 (LOOP)
-    // if (R0 == 0) exit loop
-    @R0
+    // if cmp is 0, exit loop
+    @cmp
     D=M
-    @STOP
+    @END
     D;JEQ
-    // add multiplicand to the sum
-    @sum
+    // accumilate (shifted) multiplicand for each multipler bit that is 1
+    // if cmp AND R1 is 0, skip adding the (shifted) multiplicand
+    @cmp
     D=M
     @R1
-    D=D+M
-    @sum
-    M=D
-    // decrement R0 through each iteration
+    D=D&M
+    @SKIP
+    D;JEQ
+    // add (shifted) multiplicand to sum
+    @R2
+    D=M
     @R0
-    M=M-1
+    D=D+M
+    @R2
+    M=D
+(SKIP)
+    // left shift cmp bit and multiplicand (R0)
+    @cmp
+    D=M
+    M=D+M
+    @R0
+    D=M
+    M=D+M
     // continue to next loop iteration
     @LOOP
     0;JMP
-(STOP)
-    @sum
-    D=M
-    @R2
-    M=D
 (END)
     @END
     0;JMP
