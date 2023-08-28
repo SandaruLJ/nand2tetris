@@ -39,5 +39,42 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+        /* A register */
+        // select input of A, between instruction bits and ALU output
+        Mux16(a=instruction, b=outAlu, sel=instruction[15], out=muxAluIns);
+        // A is enabled for load either if the opcode is 0 or the first dest bit is 1
+        Not(in=instruction[15], out=aInstruction);
+        Or(a=aInstruction, b=instruction[5], out=loadA);
+        ARegister(in=muxAluIns, load=loadA, out=outA, out[0..14]=addressM);
+
+        /* D register */
+        And(a=instruction[15], b=instruction[4], out=loadD);
+        DRegister(in=outAlu, load=loadD, out=outD);
+        
+        /* ALU */
+        // select y input of ALU between A and M
+        Mux16(a=outA, b=inM, sel=instruction[12], out=muxAM);
+        ALU(x=outD, y=muxAM, zx=instruction[11], nx=instruction[10],
+            zy=instruction[9], ny=instruction[8], f=instruction[7],
+            no=instruction[6], out=outAlu, out=outM, zr=zr, ng=ng);
+
+        /* RAM write */
+        And(a=instruction[15], b=instruction[3], out=writeM);
+
+        /* PC */
+        // flag invertions
+        Not(in=zr, out=notZr);
+        Not(in=ng, out=notNg);
+        
+        // compute intermediate flag-based values for some jump instructions
+        And(a=notZr, b=notNg, out=jgt);  // JGT (comp > 0)
+        Or(a=zr, b=ng, out=jle);         // JLE (comp <= 0)
+        
+        // using mux to select corresponding flag result for each jump instruction
+        Mux8Way16(a[0]=false, b[0]=jgt, c[0]=zr, d[0]=notNg, e[0]=ng, f[0]=notZr,
+                  g[0]=jle, h[0]=true, sel[0]=instruction[0], sel[1]=instruction[1],
+                  sel[2]=instruction[2], out[0]=loadCondition);
+        And(a=instruction[15], b=loadCondition, out=loadPC);
+        
+        PC(in=outA, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 }
