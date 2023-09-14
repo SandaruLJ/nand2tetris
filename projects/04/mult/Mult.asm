@@ -20,7 +20,7 @@
     D=M
     @END
     D;JEQ
-    // accumilate (shifted) multiplicand for each multipler bit that is 1
+    // accumilate (shifted) multiplicand for each multiplier bit that is 1
     // if cmp AND R1 is 0, skip adding the (shifted) multiplicand
     @cmp
     D=M
