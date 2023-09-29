@@ -1,3 +1,6 @@
 [submodule "projects/06/hack-assembler"]
 	path = projects/06/hack-assembler
 	url = ../hack-assembler.git
+[submodule "projects/08/hack-vm-translator"]
+	path = projects/08/hack-vm-translator
+	url = ../hack-vm-translator.git
