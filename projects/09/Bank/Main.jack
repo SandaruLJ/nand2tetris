@@ -1,0 +1,95 @@
+class Main {
+    function void main() {
+        var String name;
+        var char gender;
+        var int age;
+        var String password;
+        var Person customer;
+        var Account account;
+        var boolean quit;
+        var char choice;
+        var int amount;
+
+        // Welcome text
+        do Output.printString("Welcome to Banking App! ");
+        do Output.println();
+        do Output.printString("First create an account by entering your details.");
+        do Output.println();
+        do Output.println();
+        
+        // Get details to setup account
+        let name = Keyboard.readLine("Name: ");
+        do Output.printString("Gender (M/F/O): ");
+        let gender = Keyboard.readChar();
+        do Output.println();
+        let age = Keyboard.readInt("Age: ");
+        let password = Keyboard.readLine("Password: ");
+
+        // Create customer and account instances
+        let customer = Person.new(name, gender, age);
+        let account = Account.new(customer, password);
+
+        // Main loop
+        let quit = false;
+        while (~quit) {
+            do Output.moveCursor(8, 0);
+
+            // Display customer and account details
+            do customer.print();
+            do account.print();
+
+            // Display actions
+            do Output.println();
+            do Output.printString("Select action:");
+            do Output.println();
+            do Output.printString("    1. Deposit");
+            do Output.println();
+            do Output.printString("    2. Withdraw");
+            do Output.println();
+            do Output.printString("    3. Activate");
+            do Output.println();
+            do Output.printString("    4. Deactivate");
+            do Output.println();
+            do Output.printString("    5. Exit");
+            do Output.println();
+
+            do Output.println();
+            do Output.printString("Choice: ");
+            let choice = Keyboard.readChar();
+            do Output.println();
+            
+            do Output.moveCursor(21, 0);
+
+            if (choice = 49) {
+                let amount = Keyboard.readInt("Enter amount: ");
+                do account.deposit(amount);
+            } else {
+            if (choice = 50) {
+                let amount = Keyboard.readInt("Enter amount: ");
+                do account.withdraw(amount);
+            } else {
+            if (choice = 51) {
+                do account.activate();
+            } else {
+            if (choice = 52) {
+                do account.deactivate();
+            } else {
+                let quit = true;
+            }
+            }
+            }
+            }
+
+            do Output.moveCursor(21, 0);
+            do Main.eraseLine();
+        }
+        
+        return;
+    }
+
+    function void eraseLine() {
+        do Output.printString("                                ");
+        do Output.printString("                                ");
+        return;
+    }
+}

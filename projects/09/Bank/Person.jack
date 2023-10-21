@@ -1,0 +1,39 @@
+/** Represents a bank customer. */
+class Person {
+    field String name;
+    field char gender;
+    field int age;
+
+    /** Constructs a person object with name, gender and age. */
+    constructor Person new(String _name, char _gender, int _age) {
+        let name = _name;
+        let gender = _gender;
+        let age = _age;
+        return this;
+    }
+
+    /** Accessors. */
+    method String getName() { return name; }
+    method char getGender() { return gender; }
+    method int getAge() { return age; }
+
+    /** Displays this person's details. */
+    method void print() {
+        do Output.printString("Name: ");
+        do Output.printString(name);
+        do Output.println();
+        do Output.printString("Gender: ");
+        do Output.printChar(gender);
+        do Output.println();
+        do Output.printString("Age: ");
+        do Output.printInt(age);
+        do Output.println();
+        return;
+    }
+
+    /** Disposes this person object. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

@@ -1,0 +1,70 @@
+/** Represents a bank account and related operations. */
+class Account {
+    field Person customer;
+    field int balance;
+    field boolean isActive;
+    field String password;
+
+    static int limit;
+
+    /** Constructs a bank account with a customer and a password. */
+    constructor Account new(Person _customer, String _password) {
+        let customer = _customer;
+        let password = _password;
+        // Initialize bank account as deactivated with a balance of 0
+        let balance = 0;
+        let isActive = false;
+
+        let limit = 10000;
+
+        return this;
+    }
+
+    /** Activate this bank account. */
+    method void activate() {
+        let isActive = true;
+        return;
+    }
+
+    /** Deactivate this bank account. */
+    method void deactivate() {
+        let isActive = false;
+        return;
+    }
+
+    /** Deposit money to this bank account. */
+    method boolean deposit(int amount) {
+        if (isActive & (balance + amount < (limit + 1))) {
+            let balance = balance + amount;
+            return true;
+        }
+        return false;
+    }
+
+    /** Withdraw money from this bank account. */
+    method boolean withdraw(int amount) {
+        if (isActive & (balance - amount > -1)) {
+            let balance = balance - amount;
+            return true;
+        }
+        return false;
+    }
+
+    /** Displays account information. */
+    method void print() {
+        do Output.printString("Balance: ");
+        do Output.printInt(balance);
+        do Output.printString("                ");  // Hack for writing over characters
+        do Output.println();
+        
+        do Output.printString("Status: ");
+        if (isActive) {
+            do Output.printString("Active    ");
+        } else {
+            do Output.printString("Not Active");
+        }
+        do Output.println();
+
+        return;
+    }
+}
