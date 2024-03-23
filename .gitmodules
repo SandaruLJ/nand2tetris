@@ -4,3 +4,6 @@
 [submodule "projects/08/hack-vm-translator"]
 	path = projects/08/hack-vm-translator
 	url = ../hack-vm-translator.git
+[submodule "projects/11/jack-compiler"]
+	path = projects/11/jack-compiler
+	url = ../jack-compiler.git
