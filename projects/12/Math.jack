@@ -13,7 +13,7 @@ class Math {
     /** Initializes the library. */
     function void init() {
         var int i, val;
-        
+
         /* Initialise twoToThe array */
         let twoToThe = Array.new(16);
         let i = 0;
@@ -105,15 +105,16 @@ class Math {
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-        var int y, i, temp, temp_sq;
+        var int y, i, q, qSquared;
 
         let y = 0;
         let i = 7;  // bit-width / 2 - 1
+
         while (i > -1) {
-            let temp = y + twoToThe[i];
-            let temp_sq = temp * temp;
-            if (~(temp_sq > x) & (temp_sq > 0)) {
-                let y = temp;
+            let q = y + twoToThe[i];
+            let qSquared = q * q;
+            if (~(qSquared > x) & (qSquared > 0)) {
+                let y = q;
             }
             let i = i - 1;
         }
