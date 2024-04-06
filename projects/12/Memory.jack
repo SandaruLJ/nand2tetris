@@ -9,26 +9,76 @@
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
 class Memory {
+    static Array memory;
+    // Free blocks list
+    static Array freeList;
+    static int size;
+    static int next;
 
     /** Initializes the class. */
     function void init() {
+        let memory = 0;
+
+        // Set up free blocks list
+        let freeList = 2048;      // heap base
+        let freeList[0] = 14335;  // block size
+        let freeList[1] = null;   // next block
+
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return memory[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let memory[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var Array currBlock, prevBlock, nextBlock;
+
+        let currBlock = freeList;
+        let prevBlock = null;
+
+        while (currBlock[0] < size + 2) {  // Check if block size is sufficient
+            let prevBlock = currBlock;
+            let currBlock = currBlock[1];  // Go to next block
+            if (currBlock = null) {
+                return -1;
+            }
+        }
+
+        let nextBlock = currBlock + (size + 2);  // Start of next free block
+        let nextBlock[0] = currBlock[0] - (size + 2);  // Set block size
+        let nextBlock[1] = currBlock[1];               // Set next block
+        let currBlock[0] = size;  // Set current block size
+        let currBlock[1] = null;  // Unset next block
+
+        if (prevBlock = null) {
+            let freeList = nextBlock;
+        } else {
+            let prevBlock[1] = nextBlock;  // Connect free blocks
+        }
+
+        return currBlock + 2;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        var Array block;
+
+        // Add freed block to the beginning of the list
+        let block = o - 2;
+        let block[1] = freeList;  
+        let freeList = block;
+
+        return;
     }    
 }
