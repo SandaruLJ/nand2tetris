@@ -10,34 +10,143 @@
  * the screen is indexed (0,0).
  */
 class Screen {
+    static int screen;
+    static boolean currentColour;
+    static Array twoToThe;
 
     /** Initializes the Screen. */
     function void init() {
+        var int i, val;
+
+        let screen = 16384;        // Base address of screen
+        let currentColour = true;  // Default colour: black
+
+        /* Initialise twoToThe array */
+        let twoToThe = Array.new(16);
+        let i = 0;
+        let val = 1;
+        while (i < 16) {
+            let twoToThe[i] = val;
+            let val = val + val;
+            let i = i + 1;
+        }
+
+        return;
     }
 
     /** Erases the entire screen. */
     function void clearScreen() {
+        var int i;
+        let i = screen;
+        while (i < 8192) {  // Screen size
+            do Memory.poke(i, 0);  // Set to white
+            let i = i + 1;
+        }
+        return;
     }
 
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
+        let currentColour = b;
+        return;
     }
 
     /** Draws the (x,y) pixel, using the current color. */
+    // Inspired by: https://github.com/havivha/Nand2Tetris
     function void drawPixel(int x, int y) {
+        var int addr, word, bitMask;
+
+        let addr = screen + (y * 32) + (x / 16);  // Word address in screen map
+        let word = Memory.peek(addr);    // Word to modify
+        let bitMask = twoToThe[x & 15];  // Specific bit to modify in the word
+
+        if (currentColour) {
+            do Memory.poke(addr, word | bitMask);   // Set black pixel
+        } else {
+            do Memory.poke(addr, word & ~bitMask);  // Set white pixel
+        }
+
+        return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    // Credit: https://github.com/encse/nand2tetris
     function void drawLine(int x1, int y1, int x2, int y2) {
+        var int dx, dy, dirX, dirY, error, errorX2;
+
+        let dx = Math.abs(x2 - x1);
+        let dy = Math.abs(y2 - y1);
+
+        if (x1 < x2) {
+            let dirX = 1;
+        } else {
+            let dirX = -1;
+        }
+        if (y1 < y2) {
+            let dirY = 1;
+        } else {
+            let dirY = -1;
+        }
+
+        let error = dx - dy;
+
+        while (~((x1 = x2) & (y1 = y2))) {
+            do Screen.drawPixel(x1, y1);
+
+            let errorX2 = error + error;
+
+            if (errorX2 > -dy) {
+                let error = error - dy;
+                let x1 = x1 + dirX;
+            }
+
+            if (errorX2 < dx) {
+                let error = error + dx;
+                let y1 = y1 + dirY;
+            }
+        }
+
+        do Screen.drawPixel(x1, y1);
+        return;
     }
 
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+        while (~(y1 > y2)) {
+            do Screen.drawLine(x1, y1, x2, y1);
+            let y1 = y1 + 1;
+        }
+        return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
-    function void drawCircle(int x, int y, int r) {
+    // Credit: https://github.com/encse/nand2tetris
+    function void drawCircle(int centerX, int centerY, int r) {
+        var int x, y, radiusError;
+
+        let x = r;
+        let y = 0;
+        let radiusError = 1 - x;
+
+        while( (x = y) | (x>y))
+        {
+            do Screen.drawLine(x + centerX, y + centerY, -x + centerX, y + centerY);
+            do Screen.drawLine(y + centerX, x + centerY, -y + centerX, x + centerY);
+            do Screen.drawLine(-x + centerX, -y + centerY, x + centerX, -y + centerY);
+            do Screen.drawLine(y + centerX, -x + centerY, -y + centerX, -x + centerY);
+
+            let y = y + 1;
+
+            if (radiusError < 0) {
+                let radiusError = radiusError + (2 * y) + 1;
+            } else {
+                let x = x - 1;
+                let radiusError = radiusError + (2 * (y - x + 1));
+            }
+        }
+
+        return;
     }
 }
