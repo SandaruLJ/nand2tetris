@@ -15,12 +15,18 @@
  * as a small filled square, indicates where the next character will be displayed.
  */
 class Output {
+    static int screen, cursorRow, cursorCol;
 
     // Character map for displaying characters
     static Array charMaps; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        let screen = 16384;  // Base address of screen map
+        let cursorRow = 0;
+        let cursorCol = 0;
+        do Output.initMap();
+        return;
     }
 
     // Initializes the character map array
@@ -71,7 +77,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,31,51,51,51,51,0,0); // A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -137,15 +143,15 @@ class Output {
         do Output.create(125,7,12,12,12,56,12,12,12,7,0,0);    // }
         do Output.create(126,38,45,25,0,0,0,0,0,0,0,0);        // ~
 
-	return;
+    return;
     }
 
     // Creates the character map array of the given character index, using the given values.
     function void create(int index, int a, int b, int c, int d, int e,
                          int f, int g, int h, int i, int j, int k) {
-	var Array map;
+    var Array map;
 
-	let map = Array.new(11);
+    let map = Array.new(11);
         let charMaps[index] = map;
 
         let map[0] = a;
@@ -176,28 +182,105 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        let cursorRow = i;
+        let cursorCol = j;
+        return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
+    // Credit: https://github.com/havivha/Nand2Tetris
+    // Credit: https://github.com/encse/nand2tetris
     function void printChar(char c) {
+        var Array charMap;
+        var int addr, word, i;
+        var boolean isOddCol;
+
+        let charMap = Output.getMap(c);
+        let addr = screen + (cursorRow * 32 * 11) + (cursorCol / 2);
+        let isOddCol = cursorCol - (cursorCol / 2 * 2) = 1;
+
+        // Print character
+        let i = 0;
+        while (i < 11) {
+            let word = Memory.peek(addr);
+
+            if (isOddCol) {
+                do Memory.poke(addr, (word & 255) + (charMap[i] * 256));
+            } else {
+                do Memory.poke(addr, (word & ~255) + charMap[i]);
+            }
+
+            let addr = addr + 32;
+            let i = i + 1;
+        }
+
+        // Advance cursor
+        if (cursorCol = 63) {
+            do Output.println();
+        } else {
+            let cursorCol = cursorCol + 1;
+        }
+
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int len, i;
+
+        let i = 0;
+        let len = s.length();
+        while (i < len) {
+            do Output.printChar(s.charAt(i));
+            let i = i + 1;
+        }
+
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String s;
+        
+        let s = String.new(7);  // Max digits for 16-bit including sign
+        
+        do s.setInt(i);
+        do Output.printString(s);
+        do s.dispose();
+
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        let cursorCol = 0;
+
+        if (cursorRow < 22) {
+            let cursorRow = cursorRow + 1;
+        } else {
+            let cursorRow = 0;
+        }
+
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        if (cursorCol = 0) {
+            let cursorCol = 63;
+
+            if (cursorRow = 0) {
+                let cursorRow = 22;
+            } else {
+                let cursorRow = cursorRow - 1;
+            }
+        } else {
+            let cursorCol = cursorCol - 1;
+        }
+
+        return;
     }
 }
